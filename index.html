@@ -633,6 +633,7 @@ function toggleView(){
   cv.style.display=panoramaMode?"block":"none";
   const hint=document.getElementById("direction-hint");
   if(hint&&!panoramaMode) hint.style.display="none";
+  if(panoramaMode){ bodyAngle=0; }  // reset corpo, ghiera/azimut invariati
   const btn=document.getElementById("view-toggle");
   btn.textContent=panoramaMode?"🗺 Mappa":"🏔 Panorama";
   if(panoramaMode){
