@@ -5,7 +5,7 @@
 <title>Carta Topografica + Bussola</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { display: flex; height: 100vh; background: #1a1a2e; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+body { display: flex; height: 100vh; background: #eceff1; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
 #map-wrap {
   position: relative; flex: 1; overflow: hidden; cursor: crosshair;
@@ -30,82 +30,85 @@ body { display: flex; height: 100vh; background: #1a1a2e; font-family: 'Segoe UI
 /* ── PANNELLO ── */
 #panel {
   width: 240px; flex-shrink: 0;
-  background: #16213e; color: #d0d8f0;
+  background: #ffffff; color: #212121;
   display: flex; flex-direction: column;
-  border-left: 1px solid #2a3a5c;
+  border-left: 1px solid #e0e0e0;
   overflow: hidden;
 }
-#tabs { display: flex; border-bottom: 1px solid #2a3a5c; }
+#tabs { display: flex; border-bottom: 1px solid #e0e0e0; }
 .tab {
   flex: 1; padding: 10px 6px; text-align: center;
   font-size: 11px; font-weight: 600; cursor: pointer;
-  color: #5a7aaa; border-bottom: 2px solid transparent;
+  color: #757575; border-bottom: 2px solid transparent;
   transition: all 0.15s;
 }
-.tab.active { color: #a8d8ea; border-bottom-color: #a8d8ea; }
+.tab.active { color: #1976d2; border-bottom-color: #1976d2; }
 .tab-content { display: none; flex: 1; flex-direction: column; overflow: hidden; }
 .tab-content.active { display: flex; }
 
 /* TAB POI */
-#toolbar { display: flex; gap: 6px; padding: 10px 12px; border-bottom: 1px solid #2a3a5c; flex-shrink: 0; }
+#toolbar { display: flex; gap: 6px; padding: 10px 12px; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
 .btn { flex: 1; padding: 7px 4px; border: none; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-.btn-add { background: #0f3460; color: #a8d8ea; border: 1px solid #2a5a8c; }
-.btn-add:hover, .btn-add.active { background: #1a6aaa; color: #fff; border-color: #4a9ad4; }
-.btn-export { background: #1a3a2a; color: #7adba0; border: 1px solid #2a6a4a; }
-.btn-export:hover { background: #2a5a3a; }
-.btn-import { background: #2a2a1a; color: #d4c070; border: 1px solid #5a5a2a; }
-.btn-import:hover { background: #3a3a1a; }
+.btn-add { background: #1976d2; color: #fff; border: 1px solid #1565c0; }
+.btn-add:hover, .btn-add.active { background: #1565c0; color: #fff; border-color: #0d47a1; }
+.btn-export { background: #388e3c; color: #fff; border: 1px solid #2e7d32; }
+.btn-export:hover { background: #2e7d32; }
+.btn-import { background: #f57c00; color: #fff; border: 1px solid #e65100; }
+.btn-import:hover { background: #e65100; }
 
 #poi-scroll { flex: 1; overflow-y: auto; padding: 8px 10px; }
 #poi-scroll::-webkit-scrollbar { width: 4px; }
-#poi-scroll::-webkit-scrollbar-track { background: #0f1a30; }
-#poi-scroll::-webkit-scrollbar-thumb { background: #2a4a6c; border-radius: 2px; }
-.empty-msg { text-align: center; color: #3a5a7c; font-size: 11px; padding: 30px 10px; line-height: 1.6; }
+#poi-scroll::-webkit-scrollbar-track { background: #f5f5f5; }
+#poi-scroll::-webkit-scrollbar-thumb { background: #bdbdbd; border-radius: 2px; }
+.empty-msg { text-align: center; color: #9e9e9e; font-size: 11px; padding: 30px 10px; line-height: 1.6; }
 
-.poi-card { background: #0f2040; border: 1px solid #2a3a5c; border-radius: 6px; margin-bottom: 7px; cursor: pointer; transition: border-color 0.15s, background 0.15s; overflow: hidden; }
-.poi-card:hover { border-color: #4a7aaa; }
-.poi-card.selected { border-color: #a8d8ea; background: #0f3460; }
+.poi-card { background: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 7px; cursor: pointer; transition: border-color 0.15s, background 0.15s; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.poi-card:hover { border-color: #90caf9; }
+.poi-card.selected { border-color: #1976d2; background: #e3f2fd; }
 .poi-card-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; }
 .poi-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.poi-card-name { font-size: 11px; font-weight: 600; color: #c8d8ee; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.poi-card-name { font-size: 11px; font-weight: 600; color: #212121; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.poi-card-link { background: none; border: none; color: #90a4ae; cursor: pointer; font-size: 12px; padding: 0 2px; line-height: 1; }
+.poi-card-link:hover { color: #1976d2; }
 .poi-card-del { background: none; border: none; color: rgba(200,100,100,0.65); cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; }
-.poi-card-del:hover { color: #e74c3c; }
-.poi-card-desc { font-size: 10px; color: #6a8aaa; padding: 0 10px 8px; line-height: 1.4; }
+.poi-card-del:hover { color: #e53935; }
+.poi-card-desc { font-size: 10px; color: #757575; padding: 0 10px 8px; line-height: 1.4; }
 
-#editor { border-top: 1px solid #2a3a5c; padding: 12px 14px; display: none; flex-shrink: 0; }
+#editor { border-top: 1px solid #e0e0e0; padding: 12px 14px; display: none; flex-shrink: 0; background: #fafafa; }
 #editor.visible { display: block; }
-.ed-title { font-size: 11px; font-weight: 700; color: #a8d8ea; margin-bottom: 10px; }
+.ed-title { font-size: 11px; font-weight: 700; color: #1976d2; margin-bottom: 10px; }
 .ed-row { margin-bottom: 8px; }
-.ed-label { font-size: 10px; color: #5a7aaa; margin-bottom: 3px; display: block; }
-.ed-input, .ed-select, .ed-textarea { width: 100%; padding: 6px 8px; border-radius: 4px; background: #0a1a30; border: 1px solid #2a4a6c; color: #c8d8ee; font-size: 11px; outline: none; font-family: inherit; }
+.ed-label { font-size: 10px; color: #757575; margin-bottom: 3px; display: block; }
+.ed-input, .ed-select, .ed-textarea { width: 100%; padding: 6px 8px; border-radius: 4px; background: #ffffff; border: 1px solid #bdbdbd; color: #212121; font-size: 11px; outline: none; font-family: inherit; }
 .ed-textarea { resize: vertical; min-height: 55px; line-height: 1.5; }
-.ed-input:focus, .ed-select:focus, .ed-textarea:focus { border-color: #a8d8ea; }
-.ed-save { width: 100%; padding: 7px; border-radius: 4px; border: none; background: #1a6aaa; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
-.ed-save:hover { background: #2a7aba; }
+.ed-input:focus, .ed-select:focus, .ed-textarea:focus { border-color: #1976d2; }
+.ed-save { width: 100%; padding: 7px; border-radius: 4px; border: none; background: #1976d2; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+.ed-save:hover { background: #1565c0; }
 
 /* TAB BUSSOLA */
 #compass-tab { padding: 12px 14px; gap: 10px; overflow-y: auto; display: flex; flex-direction: column; }
-.c-toggle { width: 100%; padding: 8px; border-radius: 5px; border: none; background: #0f3460; color: #a8d8ea; border: 1px solid #2a5a8c; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 4px; }
-.c-toggle:hover { background: #1a4a7a; }
-.c-toggle.on { background: #1a6aaa; color: #fff; border-color: #4a9ad4; }
-.c-section { background: #0f2040; border: 1px solid #2a3a5c; border-radius: 6px; padding: 10px 12px; }
-.c-section-title { font-size: 10px; font-weight: 700; color: #a8d8ea; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
-.c-value { text-align: center; font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 0.05em; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
-.c-value span { font-size: 12px; color: #5a7aaa; font-weight: 400; }
+.c-toggle { width: 100%; padding: 8px; border-radius: 5px; border: none; background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 4px; }
+.c-toggle:hover { background: #bbdefb; }
+.c-toggle.on { background: #1976d2; color: #fff; border-color: #1565c0; }
+.c-section { background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 12px; }
+.c-section-title { font-size: 10px; font-weight: 700; color: #1976d2; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+.c-value { text-align: center; font-size: 22px; font-weight: 700; color: #212121; letter-spacing: 0.05em; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+.c-value span { font-size: 12px; color: #757575; font-weight: 400; }
 .c-btn-row { display: flex; gap: 4px; margin-bottom: 4px; }
-.c-btn { flex: 1; padding: 6px 2px; border-radius: 4px; border: 1px solid #2a4a6c; background: #0a1a30; color: #a8d8ea; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.1s; text-align: center; }
-.c-btn:hover { background: #1a3a5a; }
-.c-btn:active { background: #2a5a8a; }
+.c-btn { flex: 1; padding: 6px 2px; border-radius: 4px; border: 1px solid #bdbdbd; background: #ffffff; color: #1565c0; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.1s; text-align: center; }
+.c-btn:hover { background: #e3f2fd; }
+.c-btn:active { background: #bbdefb; }
 .c-input-row { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
-.c-direct { flex: 1; padding: 5px 7px; border-radius: 4px; background: #0a1a30; border: 1px solid #2a4a6c; color: #c8d8ee; font-size: 12px; outline: none; text-align: center; }
-.c-direct:focus { border-color: #a8d8ea; }
-.c-set { padding: 5px 10px; border-radius: 4px; border: none; background: #1a4a6a; color: #a8d8ea; font-size: 11px; font-weight: 600; cursor: pointer; }
-.c-set:hover { background: #2a5a7a; }
-.c-info { font-size: 10px; color: #4a6a8a; line-height: 1.5; margin-top: 6px; }
+.c-direct { flex: 1; padding: 5px 7px; border-radius: 4px; background: #ffffff; border: 1px solid #bdbdbd; color: #212121; font-size: 12px; outline: none; text-align: center; }
+.c-direct:focus { border-color: #1976d2; }
+.c-set { padding: 5px 10px; border-radius: 4px; border: none; background: #1976d2; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+.c-set:hover { background: #1565c0; }
+.c-info { font-size: 10px; color: #9e9e9e; line-height: 1.5; margin-top: 6px; }
+.c-slider { width: 100%; margin: 6px 0; accent-color: #1976d2; cursor: pointer; }
 
-#statusbar { padding: 7px 14px; background: #0a1220; border-top: 1px solid #1a2a3c; font-size: 10px; color: #4a6a8a; flex-shrink: 0; }
+#statusbar { padding: 7px 14px; background: #f5f5f5; border-top: 1px solid #e0e0e0; font-size: 10px; color: #757575; flex-shrink: 0; }
 
-#tooltip { position: absolute; background: rgba(10,20,40,0.92); color: #c8d8ee; font-size: 11px; padding: 6px 10px; border-radius: 5px; pointer-events: none; border: 1px solid #2a4a6c; white-space: nowrap; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+#tooltip { position: absolute; background: rgba(33,33,33,0.9); color: #ffffff; font-size: 11px; padding: 6px 10px; border-radius: 5px; pointer-events: none; border: 1px solid #616161; white-space: nowrap; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
 </style>
 </head>
 <body>
@@ -258,47 +261,36 @@ body { display: flex; height: 100vh; background: #1a1a2e; font-family: 'Segoe UI
       <div class="c-section">
         <div class="c-section-title">Corpo</div>
         <div class="c-value" id="body-display">000 <span>°</span></div>
+        <input type="range" class="c-slider" id="body-slider" min="0" max="359" value="0"
+               oninput="bodyAngle=parseInt(this.value);applyTransforms()"/>
         <div class="c-btn-row">
-          <button class="c-btn" onclick="rotateBody(-45)">&#8722;45°</button>
-          <button class="c-btn" onclick="rotateBody(-10)">&#8722;10°</button>
           <button class="c-btn" onclick="rotateBody(-1)">&#8722;1°</button>
-        </div>
-        <div class="c-btn-row">
           <button class="c-btn" onclick="rotateBody(+1)">+1°</button>
-          <button class="c-btn" onclick="rotateBody(+10)">+10°</button>
-          <button class="c-btn" onclick="rotateBody(+45)">+45°</button>
         </div>
         <div class="c-input-row">
           <input class="c-direct" id="body-input" type="number" min="0" max="359" placeholder="0–359"/>
           <button class="c-set" onclick="setBodyDirect()">Imposta</button>
         </div>
-        <div class="c-info">Ruota corpo + ghiera insieme verso la destinazione.</div>
       </div>
 
       <div class="c-section">
         <div class="c-section-title">Ghiera</div>
         <div class="c-value" id="bezel-display">000 <span>°</span></div>
+        <input type="range" class="c-slider" id="bezel-slider" min="0" max="359" value="0"
+               oninput="bezelAngle=parseInt(this.value);applyTransforms()"/>
         <div class="c-btn-row">
-          <button class="c-btn" onclick="rotateBezel(-45)">&#8722;45°</button>
-          <button class="c-btn" onclick="rotateBezel(-10)">&#8722;10°</button>
           <button class="c-btn" onclick="rotateBezel(-1)">&#8722;1°</button>
-        </div>
-        <div class="c-btn-row">
           <button class="c-btn" onclick="rotateBezel(+1)">+1°</button>
-          <button class="c-btn" onclick="rotateBezel(+10)">+10°</button>
-          <button class="c-btn" onclick="rotateBezel(+45)">+45°</button>
         </div>
         <div class="c-input-row">
           <input class="c-direct" id="bezel-input" type="number" min="0" max="359" placeholder="0–359"/>
           <button class="c-set" onclick="setBezelDirect()">Imposta</button>
         </div>
-        <div class="c-info">Ruota solo la ghiera per allineare i meridiani al reticolato.</div>
       </div>
 
       <div class="c-section">
         <div class="c-section-title">Azimut risultante</div>
         <div class="c-value" id="azimut-display">000 <span>°</span></div>
-        <div class="c-info">Letto sull'indice arancione sul bordo del corpo.</div>
         <button class="c-btn" style="margin-top:8px;width:100%" onclick="resetCompass()">&#8635; Reset</button>
       </div>
     </div>
@@ -313,6 +305,7 @@ body { display: flex; height: 100vh; background: #1a1a2e; font-family: 'Segoe UI
 // ══════════════════════════
 const COLORS = { vetta:"#e74c3c", passo:"#3498db", rifugio:"#9b59b6", altro:"#f39c12" };
 let pois=[], selectedId=null, addingMode=false, editingId=null, nextId=1;
+let lines=[], nextLineId=1, linkingFrom=null;
 let imgNaturalW=900, imgNaturalH=900;
 
 const mapWrap   = document.getElementById("map-wrap");
@@ -364,11 +357,41 @@ mapWrap.addEventListener("click",(e)=>{
   setStatus("Punto aggiunto — compila i dati nel pannello");
 });
 
+function renderLines(){
+  poiSvg.querySelectorAll("[data-line]").forEach(el=>el.remove());
+  lines.forEach(l=>{
+    const p1=pois.find(p=>p.id===l.from),p2=pois.find(p=>p.id===l.to);
+    if(!p1||!p2)return;
+    const {x:x1,y:y1}=relToSvg(p1.rx,p1.ry);
+    const {x:x2,y:y2}=relToSvg(p2.rx,p2.ry);
+    const ln=document.createElementNS("http://www.w3.org/2000/svg","line");
+    ln.setAttribute("x1",x1);ln.setAttribute("y1",y1);ln.setAttribute("x2",x2);ln.setAttribute("y2",y2);
+    ln.setAttribute("stroke","#1976d2");ln.setAttribute("stroke-width","2");
+    ln.setAttribute("stroke-dasharray","6,3");ln.setAttribute("data-line",l.id);
+    poiSvg.appendChild(ln);
+    const mx=(x1+x2)/2,my=(y1+y2)/2;
+    const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("data-line",l.id);g.style.cursor="pointer";
+    const circ=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    circ.setAttribute("cx",mx);circ.setAttribute("cy",my);circ.setAttribute("r","8");
+    circ.setAttribute("fill","#e53935");circ.setAttribute("opacity","0.85");
+    const xt=document.createElementNS("http://www.w3.org/2000/svg","text");
+    xt.setAttribute("x",mx);xt.setAttribute("y",my+1);xt.setAttribute("text-anchor","middle");
+    xt.setAttribute("dominant-baseline","middle");xt.setAttribute("font-size","10");
+    xt.setAttribute("fill","#fff");xt.textContent="×";
+    g.appendChild(circ);g.appendChild(xt);
+    g.addEventListener("click",(e)=>{e.stopPropagation();deleteLine(l.id);});
+    poiSvg.appendChild(g);
+  });
+}
+function deleteLine(id){lines=lines.filter(l=>l.id!==id);renderAll();}
+
 function renderAll(){
   Array.from(poiSvg.children).forEach(el=>{if(el.tagName!=="defs")el.remove();});
   emptyMsg.style.display=pois.length===0?"block":"none";
   const scroll=document.getElementById("poi-scroll");
   Array.from(scroll.querySelectorAll(".poi-card")).forEach(el=>el.remove());
+  renderLines();
   pois.forEach(p=>{renderPoiSvg(p);renderPoiCard(p);});
 }
 
@@ -426,16 +449,25 @@ function renderPoiCard(p){
   const card=document.createElement("div");
   card.className="poi-card"+(p.id===selectedId?" selected":"");
   card.dataset.id=p.id;
-  card.innerHTML="<div class='poi-card-header'><div class='poi-dot' style='background:"+color+"'></div><div class='poi-card-name'>"+p.name+(p.value?" <span style='color:#5a7aaa;font-weight:400'>"+p.value+"</span>":"")+"</div><button class='poi-card-del' data-id='"+p.id+"'>&#xD7;</button></div>"+(p.desc?"<div class='poi-card-desc'>"+p.desc+"</div>":"");
+  card.innerHTML="<div class='poi-card-header'><div class='poi-dot' style='background:"+color+"'></div><div class='poi-card-name'>"+p.name+(p.value?" <span style='color:#9e9e9e;font-weight:400'>"+p.value+"</span>":"")+"</div><button class='poi-card-link' title='Collega a un altro punto'>&#x1F517;</button><button class='poi-card-del' data-id='"+p.id+"'>&#xD7;</button></div>"+(p.desc?"<div class='poi-card-desc'>"+p.desc+"</div>":"");
+  card.querySelector(".poi-card-link").addEventListener("click",(e)=>{e.stopPropagation();startLink(p.id);});
   card.querySelector(".poi-card-del").addEventListener("click",(e)=>{e.stopPropagation();deletePoi(p.id);});
   card.addEventListener("click",()=>{selectPoi(p.id);openEditor(p.id);});
   scroll.appendChild(card);
 }
 
-function selectPoi(id){selectedId=id;renderAll();const c=document.querySelector(".poi-card[data-id='"+id+"']");if(c)c.scrollIntoView({block:"nearest"});}
+function startLink(id){linkingFrom=id;setStatus("Clicca un secondo punto per collegarlo…");}
+function selectPoi(id){
+  if(linkingFrom!==null&&linkingFrom!==id){
+    lines.push({id:"line_"+nextLineId++,from:linkingFrom,to:id});
+    linkingFrom=null;renderAll();setStatus("Collegamento creato");return;
+  }
+  linkingFrom=null;selectedId=id;renderAll();
+  const c=document.querySelector(".poi-card[data-id='"+id+"']");if(c)c.scrollIntoView({block:"nearest"});
+}
 function openEditor(id){editingId=id;const p=pois.find(x=>x.id===id);if(!p)return;document.getElementById("ed-name").value=p.name||"";document.getElementById("ed-value").value=p.value||"";document.getElementById("ed-type").value=p.type||"vetta";document.getElementById("ed-desc").value=p.desc||"";editor.classList.add("visible");}
 function savePoi(){const p=pois.find(x=>x.id===editingId);if(!p)return;p.name=document.getElementById("ed-name").value.trim()||"Senza nome";p.value=document.getElementById("ed-value").value.trim();p.type=document.getElementById("ed-type").value;p.desc=document.getElementById("ed-desc").value.trim();renderAll();setStatus("Salvato: "+p.name);}
-function deletePoi(id){pois=pois.filter(p=>p.id!==id);if(selectedId===id){selectedId=null;editingId=null;editor.classList.remove("visible");}renderAll();setStatus("Punto eliminato");}
+function deletePoi(id){pois=pois.filter(p=>p.id!==id);lines=lines.filter(l=>l.from!==id&&l.to!==id);if(selectedId===id){selectedId=null;editingId=null;editor.classList.remove("visible");}renderAll();setStatus("Punto eliminato");}
 function exportJSON(){if(!pois.length){setStatus("Nessun punto");return;}const b=new Blob([JSON.stringify(pois,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="punti_carta.json";a.click();URL.revokeObjectURL(u);setStatus("Esportati "+pois.length+" punti");}
 function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=(ev)=>{try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d))throw 0;pois=d;nextId=Math.max(...pois.map(p=>parseInt(p.id.replace("poi_",""))||0),0)+1;renderAll();setStatus("Importati "+pois.length+" punti");}catch{setStatus("Errore: JSON non valido");}};r.readAsText(f);e.target.value="";}
 
@@ -524,6 +556,10 @@ function applyTransforms(){
   document.getElementById("azimut-display").innerHTML= fmt(az)     +" <span>°</span>";
   const azLabel = document.getElementById("az-label");
   if(azLabel) azLabel.textContent = fmt(az);
+  const bs=document.getElementById("body-slider");
+  const bzs=document.getElementById("bezel-slider");
+  if(bs) bs.value=bodyAngle;
+  if(bzs) bzs.value=bezelAngle;
 }
 
 function fmt(a){return String(Math.round(((a%360)+360)%360)).padStart(3,"0");}
