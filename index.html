@@ -77,6 +77,8 @@ body { display: flex; height: 100vh; background: #eceff1; font-family: 'Segoe UI
 .btn-export:hover { background: #2e7d32; }
 .btn-import { background: #f57c00; color: #fff; border: 1px solid #e65100; }
 .btn-import:hover { background: #e65100; }
+.btn-map { background: #6a1b9a; color: #fff; border: 1px solid #4a148c; }
+.btn-map:hover { background: #4a148c; }
 
 #poi-scroll { flex: 1; overflow-y: auto; padding: 8px 10px; }
 #poi-scroll::-webkit-scrollbar { width: 4px; }
@@ -320,7 +322,9 @@ body { display: flex; height: 100vh; background: #eceff1; font-family: 'Segoe UI
       <button class="btn btn-add" id="btn-add" onclick="toggleAdd()">&#43; Aggiungi</button>
       <button class="btn btn-export" onclick="exportJSON()">&#8595; JSON</button>
       <button class="btn btn-import" onclick="document.getElementById('import-file').click()">&#8593; Import</button>
+      <button class="btn btn-map" onclick="document.getElementById('map-file').click()" title="Carica una nuova mappa (verrà ridimensionata a 900×900)">&#128506; Mappa</button>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(event)"/>
+      <input type="file" id="map-file" accept="image/*" style="display:none" onchange="loadMapImage(event)"/>
     </div>
     <div id="poi-scroll">
       <div class="empty-msg" id="empty-msg">Clicca <strong>+ Aggiungi</strong><br>poi tocca un punto sulla carta</div>
@@ -560,6 +564,35 @@ function savePoi(){const p=pois.find(x=>x.id===editingId);if(!p)return;p.name=do
 function deletePoi(id){pois=pois.filter(p=>p.id!==id);lines=lines.filter(l=>l.from!==id&&l.to!==id);if(selectedId===id){selectedId=null;editingId=null;editor.classList.remove("visible");}renderAll();setStatus("Punto eliminato");}
 function exportJSON(){if(!pois.length){setStatus("Nessun punto");return;}const b=new Blob([JSON.stringify(pois,null,2)],{type:"application/json"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="punti_carta.json";a.click();URL.revokeObjectURL(u);setStatus("Esportati "+pois.length+" punti");}
 function importJSON(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=(ev)=>{try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d))throw 0;pois=d;nextId=Math.max(...pois.map(p=>parseInt(p.id.replace("poi_",""))||0),0)+1;renderAll();setStatus("Importati "+pois.length+" punti");}catch{setStatus("Errore: JSON non valido");}};r.readAsText(f);e.target.value="";}
+function loadMapImage(e){
+  const f=e.target.files[0]; if(!f) return;
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const cv=document.createElement("canvas");
+      cv.width=900; cv.height=900;
+      const ctx=cv.getContext("2d");
+      ctx.drawImage(img,0,0,900,900);
+      const dataUrl=cv.toDataURL("image/png");
+      document.getElementById("map-img").src=dataUrl;
+      if(pois.length>0){
+        if(confirm("Vuoi mantenere i punti esistenti?\n(Le coordinate relative restano invariate, ma potrebbero non corrispondere alla nuova mappa)")){
+          setStatus("Mappa aggiornata — punti mantenuti");
+        } else {
+          pois=[]; lines=[]; selectedId=null; nextId=1;
+          renderAll();
+          setStatus("Mappa aggiornata — punti azzerati");
+        }
+      } else {
+        setStatus("Mappa caricata e ridimensionata a 900×900");
+      }
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+  e.target.value="";
+}
 
 function setStatus(m){statusbar.textContent=m;}
 function switchTab(t){
