@@ -614,6 +614,32 @@ function drawPanorama(){
     ctx.fillStyle=color; ctx.font="bold 11px Segoe UI"; ctx.textAlign="center";
     ctx.fillText(p.name,px,H*0.56);
   }
+  // Indicatore direzione (solo quando allineato)
+  const totBez=((bodyAngle+bezelAngle)%360+360)%360;
+  const gap=totBez>180?totBez-360:totBez;
+  if(Math.abs(gap)<2){
+    const cx=W/2;
+    ctx.save();
+    const arrowTip=HRZ-20, arrowBase=H*0.88;
+    ctx.shadowColor="#43a047"; ctx.shadowBlur=24;
+    ctx.strokeStyle="#43a047"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(cx,arrowBase); ctx.lineTo(cx,arrowTip); ctx.stroke();
+    ctx.fillStyle="#43a047";
+    ctx.beginPath();
+    ctx.moveTo(cx,arrowTip-2);
+    ctx.lineTo(cx-14,arrowTip+22);
+    ctx.lineTo(cx+14,arrowTip+22);
+    ctx.closePath(); ctx.fill();
+    ctx.shadowBlur=12;
+    ctx.fillStyle="#ffffff";
+    ctx.font="bold 15px Segoe UI";
+    ctx.textAlign="center";
+    ctx.fillText("Questa è la tua direzione", cx, arrowBase+22);
+    ctx.font="bold 12px Segoe UI";
+    ctx.fillStyle="#a5d6a7";
+    ctx.fillText(fmt(((bodyAngle%360)+360)%360)+"°", cx, arrowBase+40);
+    ctx.restore();
+  }
 }
 
 function toggleView(){
