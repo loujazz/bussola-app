@@ -25,7 +25,7 @@ body { display: flex; height: 100vh; background: #eceff1; font-family: 'Segoe UI
 }
 #compass-wrap:active { cursor: grabbing; }
 #compass-wrap.visible { display: block; }
-#compass-svg { width: 257px; height: 450px; overflow: visible; }
+#compass-svg { width: 257px; height: 450px; overflow: visible; cursor: crosshair; }
 
 /* ── PANNELLO ── */
 #panel {
@@ -211,6 +211,13 @@ body { display: flex; height: 100vh; background: #eceff1; font-family: 'Segoe UI
             text-anchor="middle" dominant-baseline="middle"
             font-family="Segoe UI,sans-serif" font-size="9" font-weight="700"
             fill="#f39c12">000</text>
+
+      <!-- Arco allineamento: da 0° (ago) alla N della ghiera -->
+      <path id="align-arc" fill="none" stroke-width="3.5" stroke-linecap="round" opacity="0.85"/>
+      <!-- Testo stato allineamento -->
+      <text id="align-status" x="80" y="262"
+            text-anchor="middle" dominant-baseline="middle"
+            font-family="Segoe UI,sans-serif" font-size="8" font-weight="700"></text>
 
     </svg>
   </div>
@@ -531,6 +538,16 @@ function buildBezelTicks(){
 }
 buildBezelTicks();
 
+function arcPath(cx,cy,r,fromDeg,toDeg){
+  const toRad=d=>(d-90)*Math.PI/180;
+  const x1=cx+r*Math.cos(toRad(fromDeg)),y1=cy+r*Math.sin(toRad(fromDeg));
+  const norm=((toDeg%360)+360)%360;
+  if(norm===0) return "";
+  const x2=cx+r*Math.cos(toRad(norm)),y2=cy+r*Math.sin(toRad(norm));
+  const large=norm>180?1:0;
+  return `M${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${large},1 ${x2.toFixed(2)},${y2.toFixed(2)}`;
+}
+
 function applyTransforms(){
   // Corpo ruota attorno allo stesso centro della ghiera (CX, CY) per evitare drift
   bodyGroup.setAttribute("transform","rotate("+bodyAngle+","+CX+","+CY+")");
@@ -560,6 +577,20 @@ function applyTransforms(){
   const bzs=document.getElementById("bezel-slider");
   if(bs) bs.value=bodyAngle;
   if(bzs) bzs.value=bezelAngle;
+  // Indicatore allineamento ago–N
+  const totalBez=((bodyAngle+bezelAngle)%360+360)%360;
+  const alignGap=totalBez>180?totalBez-360:totalBez;
+  const arcEl=document.getElementById("align-arc");
+  const statusEl=document.getElementById("align-status");
+  const aligned=Math.abs(alignGap)<2;
+  if(arcEl){
+    if(aligned){arcEl.setAttribute("d","");}
+    else{arcEl.setAttribute("d",arcPath(CX,CY,77,0,totalBez));arcEl.setAttribute("stroke",Math.abs(alignGap)<12?"#f9a825":"#e53935");}
+  }
+  if(statusEl){
+    if(aligned){statusEl.textContent="✓ ALLINEATO";statusEl.setAttribute("fill","#43a047");}
+    else{const dir=alignGap>0?"←":"→";statusEl.textContent=dir+" "+Math.abs(Math.round(alignGap))+"°";statusEl.setAttribute("fill",Math.abs(alignGap)<12?"#f9a825":"#e53935");}
+  }
 }
 
 function fmt(a){return String(Math.round(((a%360)+360)%360)).padStart(3,"0");}
@@ -591,24 +622,43 @@ function toggleCompass(){
   setStatus(compassVisible?"Bussola attiva — trascina per spostarla":"Bussola nascosta");
 }
 
-// Drag bussola
+// Drag bussola: rotazionale (dentro ghiera) o posizionale (housing)
 compassWrap.addEventListener("mousedown",(e)=>{
   if(!compassVisible) return;
   e.stopPropagation();
-  const startX=e.clientX-compassX;
-  const startY=e.clientY-compassY;
-  const onMove=(ev)=>{
-    compassX=ev.clientX-startX;
-    compassY=ev.clientY-startY;
-    compassWrap.style.left=compassX+"px";
-    compassWrap.style.top=compassY+"px";
-  };
-  const onUp=()=>{
-    document.removeEventListener("mousemove",onMove);
-    document.removeEventListener("mouseup",onUp);
-  };
-  document.addEventListener("mousemove",onMove);
-  document.addEventListener("mouseup",onUp);
+  const rect=compassWrap.getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  const scaleX=257/160, scaleY=450/280;
+  const cx=80*scaleX, cy=170*scaleY;
+  const dist=Math.hypot(mx-cx,my-cy);
+  if(dist<=71*scaleX){
+    // Drag rotazionale — ruota corpo
+    let lastAng=Math.atan2(my-cy,mx-cx);
+    const onMove=(ev)=>{
+      const r2=compassWrap.getBoundingClientRect();
+      const nx=ev.clientX-r2.left, ny=ev.clientY-r2.top;
+      const ang=Math.atan2(ny-cy,nx-cx);
+      let delta=(ang-lastAng)*180/Math.PI;
+      if(delta>180) delta-=360;
+      if(delta<-180) delta+=360;
+      bodyAngle=((bodyAngle+delta)%360+360)%360;
+      lastAng=ang;
+      applyTransforms();
+    };
+    const onUp=()=>{document.removeEventListener("mousemove",onMove);document.removeEventListener("mouseup",onUp);};
+    document.addEventListener("mousemove",onMove);
+    document.addEventListener("mouseup",onUp);
+  } else {
+    // Drag posizionale — sposta bussola
+    const startX=e.clientX-compassX, startY=e.clientY-compassY;
+    const onMove=(ev)=>{
+      compassX=ev.clientX-startX; compassY=ev.clientY-startY;
+      compassWrap.style.left=compassX+"px"; compassWrap.style.top=compassY+"px";
+    };
+    const onUp=()=>{document.removeEventListener("mousemove",onMove);document.removeEventListener("mouseup",onUp);};
+    document.addEventListener("mousemove",onMove);
+    document.addEventListener("mouseup",onUp);
+  }
 });
 
 applyTransforms();
