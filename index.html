@@ -614,32 +614,51 @@ function drawPanorama(){
     ctx.fillStyle=color; ctx.font="bold 11px Segoe UI"; ctx.textAlign="center";
     ctx.fillText(p.name,px,H*0.56);
   }
-  // Indicatore direzione (solo quando allineato)
+  // Indicatore direzione: posizionato dove si trova l'azimut nel panorama
+  const az=((-bezelAngle%360)+360)%360;
+  const dvAz=((az-vDir+540)%360)-180; // angolo firmato dal centro, -180..+180
   const totBez=((bodyAngle+bezelAngle)%360+360)%360;
   const gap=totBez>180?totBez-360:totBez;
-  if(Math.abs(gap)<2){
-    const cx=W/2;
-    ctx.save();
-    const arrowTip=HRZ-20, arrowBase=H*0.88;
-    ctx.shadowColor="#43a047"; ctx.shadowBlur=24;
-    ctx.strokeStyle="#43a047"; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(cx,arrowBase); ctx.lineTo(cx,arrowTip); ctx.stroke();
-    ctx.fillStyle="#43a047";
+  const aligned=Math.abs(gap)<2;
+  const arrowColor=aligned?"#43a047":Math.abs(gap)<15?"#f9a825":"#e53935";
+  ctx.save();
+  if(Math.abs(dvAz)<=FOV/2+2){
+    // Indicatore visibile nel campo visivo
+    const px=W/2+(dvAz/FOV)*W;
+    const arrowTip=HRZ-8, arrowBase=H*0.86;
+    ctx.shadowColor=arrowColor; ctx.shadowBlur=aligned?24:12;
+    ctx.strokeStyle=arrowColor; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(px,arrowBase); ctx.lineTo(px,arrowTip); ctx.stroke();
+    ctx.fillStyle=arrowColor;
     ctx.beginPath();
-    ctx.moveTo(cx,arrowTip-2);
-    ctx.lineTo(cx-14,arrowTip+22);
-    ctx.lineTo(cx+14,arrowTip+22);
+    ctx.moveTo(px,arrowTip-2);
+    ctx.lineTo(px-13,arrowTip+20);
+    ctx.lineTo(px+13,arrowTip+20);
     ctx.closePath(); ctx.fill();
-    ctx.shadowBlur=12;
-    ctx.fillStyle="#ffffff";
-    ctx.font="bold 15px Segoe UI";
-    ctx.textAlign="center";
-    ctx.fillText("Questa è la tua direzione", cx, arrowBase+22);
-    ctx.font="bold 12px Segoe UI";
-    ctx.fillStyle="#a5d6a7";
-    ctx.fillText(fmt(((bodyAngle%360)+360)%360)+"°", cx, arrowBase+40);
-    ctx.restore();
+    ctx.shadowBlur=10;
+    ctx.fillStyle="#fff";
+    ctx.font="bold 14px Segoe UI"; ctx.textAlign="center";
+    if(aligned){
+      ctx.fillText("Questa è la tua direzione", px, arrowBase+18);
+    } else {
+      ctx.fillText(fmt(az)+"°", px, arrowBase+18);
+    }
+  } else {
+    // Indicatore fuori campo: freccia al bordo
+    const onRight=dvAz>0;
+    const ex=onRight?W-14:14;
+    ctx.shadowColor=arrowColor; ctx.shadowBlur=10;
+    ctx.fillStyle=arrowColor;
+    ctx.font="bold 13px Segoe UI";
+    ctx.textAlign=onRight?"right":"left";
+    ctx.fillText((onRight?"→ ":"← ")+fmt(az)+"°", onRight?W-6:6, H*0.72);
+    // Triangolino al bordo
+    ctx.beginPath();
+    if(onRight){ctx.moveTo(W-4,H*0.65);ctx.lineTo(W-18,H*0.65-10);ctx.lineTo(W-18,H*0.65+10);}
+    else{ctx.moveTo(4,H*0.65);ctx.lineTo(18,H*0.65-10);ctx.lineTo(18,H*0.65+10);}
+    ctx.closePath(); ctx.fill();
   }
+  ctx.restore();
 }
 
 function toggleView(){
