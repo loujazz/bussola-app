@@ -68,7 +68,7 @@ body { display: flex; height: 100vh; background: #1a1a2e; font-family: 'Segoe UI
 .poi-card-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; }
 .poi-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .poi-card-name { font-size: 11px; font-weight: 600; color: #c8d8ee; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.poi-card-del { background: none; border: none; color: #5a3a3a; cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; }
+.poi-card-del { background: none; border: none; color: rgba(200,100,100,0.65); cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; }
 .poi-card-del:hover { color: #e74c3c; }
 .poi-card-desc { font-size: 10px; color: #6a8aaa; padding: 0 10px 8px; line-height: 1.4; }
 
@@ -156,10 +156,6 @@ body { display: flex; height: 100vh; background: #1a1a2e; font-family: 'Segoe UI
         <!-- Tacchette righello sinistro ogni 10px -->
         <!-- Righello destro (punto lettura azimut) -->
         <line x1="152" y1="55" x2="152" y2="268" stroke="rgba(180,210,255,0.55)" stroke-width="1.5"/>
-        <!-- Indice lettura azimut -->
-        <polygon points="152,170 162,164 162,176" fill="#f39c12"/>
-        <text x="157" y="158" text-anchor="middle" font-size="7"
-              fill="#f39c12" font-family="Segoe UI,sans-serif">AZ</text>
       </g>
 
       <!-- LAYER 2: GHIERA
@@ -206,6 +202,12 @@ body { display: flex; height: 100vh; background: #1a1a2e; font-family: 'Segoe UI
         <circle cx="80" cy="170" r="5" fill="#0a1428" stroke="rgba(200,220,255,0.6)" stroke-width="1.2"/>
         <circle cx="80" cy="170" r="2" fill="#a8d8ea"/>
       </g>
+
+      <!-- Label azimut dinamica — fissa sopra la ghiera, aggiornata via JS -->
+      <text id="az-label" x="80" y="92"
+            text-anchor="middle" dominant-baseline="middle"
+            font-family="Segoe UI,sans-serif" font-size="9" font-weight="700"
+            fill="#f39c12">000</text>
 
     </svg>
   </div>
@@ -490,11 +492,8 @@ function buildBezelTicks(){
         txt.setAttribute("font-size","9");txt.setAttribute("font-weight","700");
         txt.setAttribute("fill","rgba(220,240,255,0.95)");
         txt.textContent=i===0?"N":i===90?"E":i===180?"S":"W";
-      } else {
-        txt.setAttribute("font-size","7");txt.setAttribute("fill","rgba(180,210,255,0.75)");
-        txt.textContent=i;
+        lG.appendChild(txt);
       }
-      lG.appendChild(txt);
     }
   }
 }
@@ -523,6 +522,8 @@ function applyTransforms(){
   document.getElementById("body-display").innerHTML  = fmt(bNorm)  +" <span>°</span>";
   document.getElementById("bezel-display").innerHTML = fmt(bzNorm) +" <span>°</span>";
   document.getElementById("azimut-display").innerHTML= fmt(az)     +" <span>°</span>";
+  const azLabel = document.getElementById("az-label");
+  if(azLabel) azLabel.textContent = fmt(az);
 }
 
 function fmt(a){return String(Math.round(((a%360)+360)%360)).padStart(3,"0");}
