@@ -141,21 +141,21 @@ body { display: flex; height: 100vh; background: #1a1a2e; font-family: 'Segoe UI
       <g id="body-group">
         <!-- Rettangolo corpo — opacità aumentata -->
         <rect x="2" y="2" width="156" height="276" rx="12" ry="12"
-              fill="rgba(180,210,255,0.22)" stroke="rgba(200,220,255,0.75)" stroke-width="2"/>
+              fill="rgba(180,210,255,0.45)" stroke="rgba(200,220,255,0.75)" stroke-width="2"/>
         <!-- Righe interne corpo (texture leggera) -->
         <rect x="8" y="8" width="144" height="260" rx="9" ry="9"
-              fill="none" stroke="rgba(180,210,255,0.12)" stroke-width="1"/>
+              fill="none" stroke="rgba(180,210,255,0.28)" stroke-width="1"/>
         <!-- Freccia di direzione in cima -->
         <polygon points="80,10 72,32 80,25 88,32"
                  fill="#e74c3c" stroke="rgba(255,100,100,0.4)" stroke-width="1"/>
         <text x="80" y="44" text-anchor="middle" font-size="8"
-              fill="rgba(200,220,255,0.6)" font-family="Segoe UI,sans-serif"
+              fill="rgba(200,220,255,0.85)" font-family="Segoe UI,sans-serif"
               letter-spacing="0.5">DIR</text>
         <!-- Righello sinistro -->
-        <line x1="8" y1="55" x2="8" y2="268" stroke="rgba(180,210,255,0.3)" stroke-width="1"/>
+        <line x1="8" y1="55" x2="8" y2="268" stroke="rgba(180,210,255,0.55)" stroke-width="1"/>
         <!-- Tacchette righello sinistro ogni 10px -->
         <!-- Righello destro (punto lettura azimut) -->
-        <line x1="152" y1="55" x2="152" y2="268" stroke="rgba(180,210,255,0.45)" stroke-width="1.5"/>
+        <line x1="152" y1="55" x2="152" y2="268" stroke="rgba(180,210,255,0.55)" stroke-width="1.5"/>
         <!-- Indice lettura azimut -->
         <polygon points="152,170 162,164 162,176" fill="#f39c12"/>
         <text x="157" y="158" text-anchor="middle" font-size="7"
@@ -501,8 +501,8 @@ function buildBezelTicks(){
 buildBezelTicks();
 
 function applyTransforms(){
-  // Corpo ruota attorno al proprio centro geometrico (80, 140)
-  bodyGroup.setAttribute("transform","rotate("+bodyAngle+",80,140)");
+  // Corpo ruota attorno allo stesso centro della ghiera (CX, CY) per evitare drift
+  bodyGroup.setAttribute("transform","rotate("+bodyAngle+","+CX+","+CY+")");
 
   // La ghiera ruota attorno al suo centro (CX, CY)
   // Il suo angolo totale = bodyAngle + bezelAngle
@@ -516,9 +516,9 @@ function applyTransforms(){
   // Display valori
   const bNorm = ((bodyAngle%360)+360)%360;
   const bzNorm = ((bezelAngle%360)+360)%360;
-  // Azimut = angolo del corpo letto sulla ghiera
-  // = bodyAngle - bezelAngle (quanto il corpo è ruotato rispetto alla ghiera)
-  const az = ((bodyAngle - bezelAngle)%360+360)%360;
+  // Azimut = valore letto sulla ghiera alla linea di direzione
+  // Dipende solo da bezelAngle, non cambia ruotando il corpo
+  const az = ((-bezelAngle)%360+360)%360;
 
   document.getElementById("body-display").innerHTML  = fmt(bNorm)  +" <span>°</span>";
   document.getElementById("bezel-display").innerHTML = fmt(bzNorm) +" <span>°</span>";
