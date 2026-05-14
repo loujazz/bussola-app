@@ -590,25 +590,6 @@ function drawPanorama(){
     }
   }
 
-  const CARDINALS={0:"N",45:"NE",90:"E",135:"SE",180:"S",225:"SO",270:"O",315:"NO"};
-  for(let az=0;az<360;az+=5){
-    const dx=((az-vDir+540)%360)-180;
-    if(Math.abs(dx)>FOV/2) continue;
-    const x=W/2+(dx/FOV)*W;
-    const isCard=(az%45===0), isMaj=(az%10===0);
-    const tickH=isCard?18:isMaj?12:7;
-    ctx.strokeStyle="rgba(255,255,255,"+(isCard?0.95:isMaj?0.6:0.35)+")";
-    ctx.lineWidth=isCard?2:1;
-    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,tickH); ctx.stroke();
-    if(isCard){
-      ctx.fillStyle="#fff"; ctx.font="bold 13px Segoe UI";
-      ctx.textAlign="center"; ctx.fillText(CARDINALS[az],x,32);
-    }
-  }
-  ctx.fillStyle="rgba(255,255,255,0.9)";
-  ctx.font="bold 11px Segoe UI"; ctx.textAlign="center";
-  ctx.fillText(fmt(vDir)+"°", W/2, 46);
-
   for(const p of pois){
     const dx=p.rx-0.5, dy=-(p.ry-0.5);
     const poiAz=((Math.atan2(dx,dy)*180/Math.PI)+360)%360;
@@ -620,6 +601,40 @@ function drawPanorama(){
     ctx.beginPath(); ctx.moveTo(px,H*0.72); ctx.lineTo(px,H*0.58); ctx.stroke();
     ctx.fillStyle=color; ctx.font="bold 11px Segoe UI"; ctx.textAlign="center";
     ctx.fillText(p.name,px,H*0.56);
+  }
+  // Linea azimut dalla freccia DIR (solo quando allineato)
+  if(compassVisible){
+    const totBez=((bodyAngle+bezelAngle)%360+360)%360;
+    const gap=totBez>180?totBez-360:totBez;
+    const az=((-bezelAngle%360)+360)%360;
+    if(Math.abs(gap)<2){
+      const rad=bodyAngle*Math.PI/180;
+      const scaleX=257/160, scaleY=450/280;
+      const tipX=compassX+(80+160*Math.sin(rad))*scaleX;
+      const tipY=compassY+(170-160*Math.cos(rad))*scaleY;
+      const dirX=Math.sin(rad), dirY=-Math.cos(rad);
+      const maxLen=280;
+      let t=maxLen;
+      if(dirX>0) t=Math.min(t,(W-tipX)/dirX);
+      else if(dirX<0) t=Math.min(t,(-tipX)/dirX);
+      if(dirY<0) t=Math.min(t,(-tipY)/dirY);
+      else if(dirY>0) t=Math.min(t,(H-tipY)/dirY);
+      t=Math.max(t,60);
+      const endX=tipX+dirX*t, endY=tipY+dirY*t;
+      ctx.save();
+      ctx.strokeStyle="#e74c3c"; ctx.lineWidth=2;
+      ctx.setLineDash([8,4]);
+      ctx.shadowColor="rgba(0,0,0,0.5)"; ctx.shadowBlur=4;
+      ctx.beginPath(); ctx.moveTo(tipX,tipY); ctx.lineTo(endX,endY); ctx.stroke();
+      ctx.setLineDash([]);
+      const perpX=-dirY, perpY=dirX;
+      const lx=endX+perpX*22, ly=endY+perpY*22;
+      ctx.shadowColor="rgba(0,0,0,0.7)"; ctx.shadowBlur=6;
+      ctx.fillStyle="#ffffff"; ctx.font="bold 17px Segoe UI";
+      ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText(fmt(az)+"°", lx, ly);
+      ctx.restore();
+    }
   }
 }
 
