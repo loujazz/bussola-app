@@ -592,7 +592,7 @@ function drawPanorama(){
 
   const CARDINALS={0:"N",45:"NE",90:"E",135:"SE",180:"S",225:"SO",270:"O",315:"NO"};
   for(let az=0;az<360;az+=5){
-    const dx=((az-vDir+180)%360)-180;
+    const dx=((az-vDir+540)%360)-180;
     if(Math.abs(dx)>FOV/2) continue;
     const x=W/2+(dx/FOV)*W;
     const isCard=(az%45===0), isMaj=(az%10===0);
@@ -612,7 +612,7 @@ function drawPanorama(){
   for(const p of pois){
     const dx=p.rx-0.5, dy=-(p.ry-0.5);
     const poiAz=((Math.atan2(dx,dy)*180/Math.PI)+360)%360;
-    const dv=((poiAz-vDir+180)%360)-180;
+    const dv=((poiAz-vDir+540)%360)-180;
     if(Math.abs(dv)>FOV/2-4) continue;
     const px=W/2+(dv/FOV)*W;
     const color=COLORS[p.type]||"#f39c12";
