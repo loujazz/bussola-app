@@ -170,7 +170,9 @@ body { display: flex; height: 100vh; background: #eceff1; font-family: 'Segoe UI
   flex-shrink: 0;
 }
 #panel-logo { font-size: 20px; }
-#panel-app-name { font-family: "Segoe UI", sans-serif; font-size: 14px; font-weight: 700; color: #1565c0; letter-spacing: 0.3px; }
+#panel-app-name { font-family: "Segoe UI", sans-serif; font-size: 14px; font-weight: 700; color: #1565c0; letter-spacing: 0.3px; flex: 1; }
+#panel-home-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #90a4ae; padding: 2px 4px; border-radius: 4px; line-height: 1; transition: color 0.2s, background 0.2s; }
+#panel-home-btn:hover { color: #1565c0; background: #e3f2fd; }
 </style>
 </head>
 <body>
@@ -309,6 +311,7 @@ body { display: flex; height: 100vh; background: #eceff1; font-family: 'Segoe UI
   <div id="panel-header">
     <span id="panel-logo">🧭</span>
     <span id="panel-app-name">Bussola Topografica</span>
+    <button id="panel-home-btn" onclick="showHome()" title="Mostra la homepage">&#8962;</button>
   </div>
   <div id="tabs">
     <div class="tab active" onclick="switchTab('poi')">&#x1F4CD; Punti</div>
@@ -802,11 +805,11 @@ function arcPath(cx,cy,r,fromDeg,toDeg){
 function startApp(){
   const overlay=document.getElementById("home-overlay");
   if(overlay){ overlay.classList.add("hidden"); setTimeout(()=>overlay.style.display="none",400); }
-  try{ localStorage.setItem("bussola_visited","1"); } catch(e){}
 }
-(function(){
-  try{ if(localStorage.getItem("bussola_visited")) startApp(); } catch(e){}
-})();
+function showHome(){
+  const overlay=document.getElementById("home-overlay");
+  if(overlay){ overlay.style.display="flex"; requestAnimationFrame(()=>overlay.classList.remove("hidden")); }
+}
 
 function resetAll(){
   if(panoramaMode) toggleView();
