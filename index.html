@@ -17,15 +17,15 @@ body { display: flex; height: 100vh; background: #eceff1; font-family: 'Segoe UI
 
 #compass-wrap {
   position: absolute;
-  top: 80px; left: 80px;
-  width: 160px; height: 280px;
+  top: 20px; left: 20px;
+  width: 257px; height: 450px;
   display: none;
   user-select: none;
   cursor: grab;
 }
 #compass-wrap:active { cursor: grabbing; }
 #compass-wrap.visible { display: block; }
-#compass-svg { width: 160px; height: 280px; overflow: visible; }
+#compass-svg { width: 257px; height: 450px; overflow: visible; }
 
 /* ── PANNELLO ── */
 #panel {
@@ -133,7 +133,7 @@ body { display: flex; height: 100vh; background: #eceff1; font-family: 'Segoe UI
        - needle-group: NON ruota mai (ago fisso verso Nord)
   -->
   <div id="compass-wrap">
-    <svg id="compass-svg" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+    <svg id="compass-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 280" overflow="visible">
       <defs>
         <clipPath id="bezel-clip">
           <circle cx="80" cy="170" r="71"/>
@@ -485,8 +485,8 @@ window.addEventListener("resize",()=>renderAll());
 let compassVisible = false;
 let bezelAngle = 0;   // rotazione propria della ghiera (relativa al corpo)
 let bodyAngle  = 0;   // rotazione del corpo
-let compassX   = 100;
-let compassY   = 80;
+let compassX   = 20;
+let compassY   = 20;
 
 const compassWrap = document.getElementById("compass-wrap");
 const bodyGroup   = document.getElementById("body-group");
